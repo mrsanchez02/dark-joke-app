@@ -1,25 +1,38 @@
-import logo from './logo.svg';
-import './App.css';
+import { useContext } from 'react';
+import JokeCard from './components/JokeCard';
+import NavBar from './components/layout/NavBar';
+import Spinner from './components/Spinner';
+import useFetch from './hooks/useFetch';
+import darkModeContext from './context/darkModeContext';
 
 function App() {
+  
+  const DarkModeContext = useContext(darkModeContext);
+  const { dark } = DarkModeContext;
+
+  const URI = 'https://v2.jokeapi.dev/joke/Miscellaneous,Pun,Spooky,Christmas?blacklistFlags=nsfw,religious,political,racist,sexist,explicit&type=single';
+  const URI_DARK = 'https://v2.jokeapi.dev/joke/Dark?type=single';
+
+  const {data , loading, error, refetch } = useFetch(`${dark?URI_DARK:URI}`);
+
+  if(error) console.log(error);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <>
+      <NavBar/>
+      <div className='container'>
+      {loading ?
+      <Spinner/> :
+      <>
+        <JokeCard 
+          joke={data}
+          refresh={refetch}
+        />
+      </>
+      }
     </div>
-  );
+    </>
+);
 }
 
 export default App;
